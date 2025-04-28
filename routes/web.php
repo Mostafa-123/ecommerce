@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Website\CartConteoller;
+use App\Http\Controllers\Website\CheckoutController;
 use App\Http\Controllers\Website\shopController;
 use App\Http\Controllers\Website\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
@@ -37,14 +38,21 @@ Route::post('wishlist/move_to_cart/{rowId}',[WishlistController::class,'move_to_
 Route::get('/cart',[CartConteoller::class,'index'])->name('cart.index');
 Route::post('cart/add',[CartConteoller::class,'add_to_cart'])->name('cart.add');
 
+Route::post('cart/apply-coupon',[CouponController::class,'apply_coupon'])->name('admin.coupons.apply');
+Route::delete('cart/remove-coupon',[CouponController::class,'remove_coupon'])->name('admin.coupons.remove');
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
+    Route::get('/checkout',[CheckoutController::class,'checkout'])->name('cart.checkout');
+    Route::post('/order/make',[CheckoutController::class,'make_order'])->name('order.make');
+    Route::get('/order/confirm',[CheckoutController::class,'confirm_order'])->name('order.confirm');
+
+
 });
 
 Route::middleware(['auth',RoleMiddleware::class])->group(function(){
     Route::get('/admin-dashboard', [AdminController::class, 'index'])->name('admin.index');
-
+    Route::get('/admin/search', [AdminController::class, 'search'])->name('admin.search');
 
     Route::resource('admin/brands', BrandController::class)->names([
         'index' => 'admin.brands',
@@ -84,6 +92,8 @@ Route::middleware(['auth',RoleMiddleware::class])->group(function(){
         'update' => 'admin.coupons.update',
         'destroy' => 'admin.coupons.delete',
     ]);
+
+
 
 
 });
